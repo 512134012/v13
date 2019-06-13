@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"> 
+<head>
+    <base href="/"/>
+    <meta charset="UTF-8">
+    <title>商品的列表页面</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+
+</head>
+<body>
+    <div class="container-fluid">
+     <!--    按钮    -->
+        <div class="row">
+     <!--   列偏移   -->
+            <div class="col-md-4 col-md-offset-8">
+                <button type="button" class="btn btn-primary" id="to-add">添加</button>
+                <button type="button" class="btn btn-danger ">批量删除</button>
+            </div>
+        </div>
+     <!--    列表    -->
+        <div class="col-md-12">
+            <table class="table table-hover">
+                <tr>
+                    <td>
+                        <input type="checkbox" id="checkAll"/>
+                    </td>
+                    <td>商品类别</td>
+                    <td>名称</td>
+                    <td>价格</td>
+                    <td>图片</td>
+                    <td>卖点</td>
+                    <td>操作</td>
+                </tr>
+                <tr th:each="product : ${page.list}">
+                    <td>
+                       <input type="checkbox" class="cbx" th:id="${product.id}"/>
+                    </td>
+                    <td th:text="${product.typeName}"></td>
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.price}"></td>
+                    <td>
+                        <img src="#" th:src="${product.images}" style="height: 50px; width: 50px">
+                    </td>
+                    <td th:text="${product.salePoint}"></td>
+                    <td>
+                        <button type="button" class="btn btn-primary btn-sm btn-update" th:id="${product.id}">修改</button>
+                        <button type="button" class="btn btn-danger btn-sm btn-delete" th:id="${product.id}">删除</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+     <!--    分页信息    -->
+        <div class="row">
+            <div class="col-md-6">
+                现在是第<span th:text="${page.pageNum}"></span>页，
+                每页显示<span th:text="${page.pageSize}"></span>条记录，
+                共<span th:text="${page.pages}"></span>页
+            </div>
+            <div class="col-md-6">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li th:class="${page.pageNum == 1 ? 'disabled' : ''}">
+                            <a href="#" th:href="|product/page/${page.pageNum-1}/${page.pageSize}|" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                            <li th:each="pageNum : ${page.navigatepageNums}"
+                                th:class="${page.pageNum == pageNum ? 'active' : ''}">
+                                <a href="#" th:href="|product/page/${pageNum}/${page.pageSize}|" th:text="${pageNum}">1</a>
+                            </li>
+
+                        <li th:class="${page.pageNum == page.pages ? 'disabled' : ''}">
+                            <a href="#" th:href="|product/page/${page.pageNum+1}/${page.pageSize}|" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+     <!--  添加弹出层  -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="addModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">添加操作</h4>
+                </div>
+                <div class="modal-body">
+                 <!--     添加商品的表单    -->
+                    <form class="form-horizontal" id="addForm" action="product/save" method="post">
+                        <div class="form-group" >
+                            <label for="name" class="col-sm-2 control-label">商品名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="name" placeholder="" name="tProduct.name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="price" class="col-sm-2 control-label">商品价格</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="price" placeholder="" name="tProduct.price">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="salePrice" class="col-sm-2 control-label">促销价</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="salePrice" placeholder="" name="tProduct.salePrice">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="images" class="col-sm-2 control-label">商品图片</label>
+                            <div class="col-sm-10">
+                                <input type="file" class="form-control" id="images" placeholder="" name="tProduct.images">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="salePoint" class="col-sm-2 control-label">商品卖点</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="salePoint" placeholder="" name="tProduct.salePoint">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="typeId" class="col-sm-2 control-label">类别名称</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="typeId" name="tProduct.typeId">
+                                    <option value="1">java程序员</option>
+                                </select>
+
+                                <input type="hidden" value="java程序员" name="tProduct.typeName" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDesc" class="col-sm-2 control-label">商品描述</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="3" id="productDesc" name="productDesc"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="add">确定</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" ></script>
+    <script type="text/javascript">
+        $(function () {
+            //为添加按钮绑定事件
+            $('#to-add').click(function () {
+                //控制层弹出
+                $('#addModal').modal({
+                    backdrop : "static",
+                    keyboard : false
+                });
+            })
+
+            //为确定按钮绑定提交添加事件
+            $('#add').click(function () {
+                //提交表单
+                $('#addForm').submit();
+            })
+
+            //为修改按钮绑定事件
+            $('.btn-update').click(function () {
+                var id = $(this).prop('id');
+                alert(id);
+            })
+
+            $('.btn-delete').click(function () {
+                var id = $(this).prop('id');
+                //发送ajax请求
+                $.ajax({
+                    url : "product/del/"+id,
+                    type : "POST",
+                    success:function (data) {
+                        if (data.statusCode==200){
+                            alert(data.data);
+                            location.reload();
+                        }else {
+                            alert(data.data);
+                        }
+                    }
+                })
+            })
+
+            //实现全选的控制效果
+            $("#checkAll").click(function () {
+                $(".cbx").prop("checked",$(this).prop("checked"))
+            })
+
+            //计算全选是否checked
+            $(".cbx").click(function () {
+                $("#checkAll").prop("checked",$(".cbx").length == $(".cbx:checked").length)
+            })
+
+        })
+    </script>
+</body>
+</html>
